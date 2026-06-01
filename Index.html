@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brave Frontier: Origin - Gacha Banner Creator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Light Theme (Default) */
+        :root {
+            --bg-primary: #f5f5f0;
+            --bg-secondary: #e8e4d8;
+            --bg-tertiary: #dfdcd0;
+            --border-color: #c8c4b8;
+            --text-primary: #2c2a24;
+            --text-secondary: #5a5648;
+            --text-muted: #8a8678;
+            --accent-primary: #8b7355;
+            --accent-secondary: #6b5340;
+            --accent-success: #5a7a3a;
+            --accent-danger: #8a5a5a;
+            --accent-warning: #c4a54a;
+            --input-bg: #ffffff;
+            --header-bg: #e8e4d8;
+            --header-border: #c8c4b8;
+            --card-bg: #ffffff;
+            --tag-bg: #f0ece0;
+            --tag-text: #6b5340;
+            --json-bg: #fafaf5;
+            --json-text: #2c2a24;
+            --scrollbar-track: #e8e4d8;
+            --scrollbar-thumb: #b8b0a0;
+        }
+
+        /* Dark Theme */
+        body.dark {
+            --bg-primary: #1a1a1e;
+            --bg-secondary: #24242a;
+            --bg-tertiary: #2a2a32;
+            --border-color: #3a3a42;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b8;
+            --text-muted: #808088;
+            --accent-primary: #7a6a5a;
+            --accent-secondary: #5a4a3a;
+            --accent-success: #6a8a4a;
+            --accent-danger: #8a5a5a;
+            --accent-warning: #a48a3a;
+            --input-bg: #2a2a32;
+            --header-bg: #24242a;
+            --header-border: #3a3a42;
+            --card-bg: #24242a;
+            --tag-bg: #2a2a32;
+            --tag-text: #c0b8a8;
+            --json-bg: #1e1e24;
+            --json-text: #d0d0d0;
+            --scrollbar-track: #2a2a32;
+            --scrollbar-thumb: #4a4a52;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            color: var(--text-primary);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 8px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--header-bg);
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--header-border);
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .discord-link {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+            text-decoration: none;
+        }
+
+        .discord-link:hover {
+            text-decoration: underline;
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            gap: 1px;
+            background: var(--border-color);
+        }
+
+        .left-panel, .right-panel {
+            background: var(--bg-primary);
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .left-panel {
+            flex: 1;
+        }
+
+        .right-panel {
+            flex: 1;
+        }
+
+        .bottom-panel {
+            background: var(--header-bg);
+            border-top: 1px solid var(--border-color);
+            flex-shrink: 0;
+            max-height: 35%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .panel-header h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+
+        .panel-header .toggle-icon {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .json-container {
+            overflow: auto;
+            flex: 1;
+            padding: 15px;
+        }
+
+        .json-preview {
+            background: var(--json-bg);
+            color: var(--json-text);
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 11px;
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-section {
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+        .form-section-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-primary);
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        textarea {
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input {
+            width: auto;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        .note {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .note a {
+            color: var(--accent-primary);
+            text-decoration: none;
+        }
+
+        .note a:hover {
+            text-decoration: underline;
+        }
+
+        .batch-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .batch-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .batch-title {
+            font-weight: 600;
+            color: var(--accent-primary);
+            font-size: 0.9rem;
+        }
+
+        .remove-batch {
+            background: var(--accent-danger);
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .remove-batch:hover {
+            opacity: 0.8;
+        }
+
+        .character-ids {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .character-tag {
+            background: var(--tag-bg);
+            color: var(--tag-text);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .character-tag button {
+            background: none;
+            border: none;
+            color: var(--accent-danger);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            padding: 0 2px;
+        }
+
+        .character-tag button:hover {
+            opacity: 0.7;
+        }
+
+        .add-character {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .add-character input {
+            flex: 1;
+        }
+
+        button {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: var(--border-color);
+        }
+
+        .btn-primary {
+            background: var(--accent-success);
+            color: white;
+            border-color: var(--accent-success);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.85;
+        }
+
+        .btn-danger {
+            background: var(--accent-danger);
+            color: white;
+            border-color: var(--accent-danger);
+        }
+
+        .btn-danger:hover {
+            opacity: 0.85;
+        }
+
+        .btn-warning {
+            background: var(--accent-warning);
+            color: white;
+            border-color: var(--accent-warning);
+        }
+
+        .btn-warning:hover {
+            opacity: 0.85;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .batch-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .weight-warning {
+            background: var(--bg-secondary);
+            border-left: 3px solid var(--accent-warning);
+            padding: 10px;
+            margin-top: 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .weight-success {
+            border-left-color: var(--accent-success);
+        }
+
+        .help-links {
+            background: var(--bg-secondary);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 0.75rem;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            border: 1px solid var(--border-color);
+        }
+
+        .help-links a {
+            color: var(--accent-primary);
+            text-decoration: none;
+        }
+
+        .help-links a:hover {
+            text-decoration: underline;
+        }
+
+        .auto-balance-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        .auto-balance-toggle input {
+            width: auto;
+            margin: 0;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 4px;
+        }
+
+        .collapsible {
+            cursor: pointer;
+        }
+
+        .collapsible-content {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .collapsible-content.collapsed {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <span id="themeIcon">☀️</span>
+        <span id="themeText">Light Mode</span>
+    </button>
+
+    <div class="app">
+        <div class="header">
+            <h1>⚔️ Brave Frontier : Origin [v1.0] Gacha Banner Creator</h1>
+            <p>Create and edit banners, then export to JSON. Send to @Dreamoe on BF:O Discord</p>
+            <a href="https://discord.gg/JmhNNy4fMc" class="discord-link" target="_blank">💬 Join the Brave Frontier: Origin Discord Server</a>
+        </div>
+
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="form-section">
+                    <div class="form-section-title">📋 Basic Information</div>
+                    <div class="form-group">
+                        <label>Banner Name</label>
+                        <input type="text" id="bannerName" placeholder="e.g., Festival of Heroes" value="Banner 1">
+                    </div>
+                    <div class="form-group">
+                        <label>Banner Cost</label>
+                        <input type="number" id="bannerCost" value="100">
+                        <div class="note">💰 Cost in Zel or Gems depending on toggle below</div>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="bannerUsesZel">
+                        <label>🪙 Uses Zel instead of Gems</label>
+                    </div>
+                    <div class="form-group">
+                        <label>Banner Type</label>
+                        <select id="bannerType">
+                            <option value="Standard">Standard</option>
+                            <option value="Honor">Honor</option>
+                            <option value="Reduced Cost">Reduced Cost</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>🖼️ Splash Art Image Name</label>
+                        <input type="text" id="splashArtName" placeholder="e.g., splash_art_festival">
+                        <div class="note">📁 Follow the image name 1:1 from BF_ASSETS\assets\content\gacha</div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">📝 Description</div>
+                    <div class="form-group">
+                        <label>Short Description</label>
+                        <textarea id="bannerDescription" rows="2" placeholder="Brief banner description..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Expanded Description</label>
+                        <textarea id="bannerDescriptionExpanded" rows="3" placeholder="Detailed banner description..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">⭐ Featured Character</div>
+                    <div class="form-group">
+                        <label>Featured Character ID</label>
+                        <input type="number" id="featuredCharacterId" value="0">
+                        <div class="note">💡 Leave as 0 if no rate-up unit</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Rate Up Percentage (%)</label>
+                        <input type="number" id="rateUpPercent" step="0.1" value="0">
+                        <div class="note">📈 Chance increase for featured character</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="form-section">
+                    <div class="form-section-title">🎲 Summon Pool Batches</div>
+                    
+                    <div class="help-links">
+                        <span>📚 References:</span>
+                        <a href="https://bravefrontierglobal.fandom.com/wiki/Unit_List" target="_blank">📖 Unit List (Wiki)</a>
+                        <a href="https://bravefrontierglobal.fandom.com/wiki/Unit_Batches" target="_blank">📦 Unit Batches (Original)</a>
+                        <span>⚠️ Units until ID 337 only available for v1.0 BF:O</span>
+                    </div>
+                    
+                    <div class="auto-balance-toggle">
+                        <input type="checkbox" id="autoBalanceCheckbox">
+                        <label>⚖️ Auto-balance weights to 100%</label>
+                    </div>
+                    
+                    <div class="batch-actions">
+                        <button class="btn-warning" onclick="balanceEvenly()">🔄 Balance Evenly</button>
+                        <button class="btn-warning" onclick="balanceProportionally()">📊 Balance Proportionally</button>
+                        <button class="btn-warning" onclick="normalizeTo100()">🎯 Normalize to 100%</button>
+                    </div>
+                    
+                    <div id="batchesContainer"></div>
+                    
+                    <div class="action-bar">
+                        <button class="btn-primary" onclick="addBatch()">➕ Add Batch</button>
+                    </div>
+                    
+                    <div id="weightWarning" class="weight-warning" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-panel">
+            <div class="panel-header collapsible" onclick="toggleBottomPanel()">
+                <h3>🔍 JSON Preview & Export</h3>
+                <span class="toggle-icon" id="toggleIcon">▼</span>
+            </div>
+            <div class="collapsible-content" id="bottomContent">
+                <div class="json-container">
+                    <div class="json-preview" id="jsonPreview">
+                        👈 Click "Preview JSON" to see output
+                    </div>
+                    <div class="action-bar" style="margin-top: 15px; border-top: none; padding-top: 0;">
+                        <button class="btn-primary" onclick="previewJSON()">👁️ Preview JSON</button>
+                        <button class="btn-primary" onclick="downloadJSON()">💾 Download JSON File</button>
+                        <button class="btn-warning" onclick="importJSON()">📂 Import JSON File</button>
+                        <button class="btn-danger" onclick="resetForm()">🗑️ Reset Form</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let batches = [];
+        let autoBalanceEnabled = false;
+        let currentJsonData = null;
+
+        // Theme Toggle
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+            
+            if (body.classList.contains('dark')) {
+                body.classList.remove('dark');
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Light Mode';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.classList.add('dark');
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark Mode';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark');
+            document.getElementById('themeIcon').textContent = '🌙';
+            document.getElementById('themeText').textContent = 'Dark Mode';
+        }
+
+        document.getElementById('autoBalanceCheckbox').addEventListener('change', (e) => {
+            autoBalanceEnabled = e.target.checked;
+            if (autoBalanceEnabled && batches.length > 0) {
+                balanceEvenly();
+            }
+        });
+
+        function balanceEvenly() {
+            if (batches.length === 0) return;
+            
+            const equalWeight = 100 / batches.length;
+            batches.forEach(batch => {
+                batch.weight = Math.round(equalWeight * 10) / 10;
+            });
+            
+            const total = batches.reduce((sum, b) => sum + b.weight, 0);
+            if (Math.abs(total - 100) > 0.01) {
+                const lastBatch = batches[batches.length - 1];
+                lastBatch.weight = Math.round((lastBatch.weight + (100 - total)) * 10) / 10;
+            }
+            
+            renderBatches();
+        }
+
+        function balanceProportionally() {
+            if (batches.length === 0) return;
+            
+            const currentTotal = batches.reduce((sum, b) => sum + b.weight, 0);
+            if (currentTotal === 0) {
+                balanceEvenly();
+                return;
+            }
+            
+            batches.forEach(batch => {
+                batch.weight = Math.round((batch.weight / currentTotal * 100) * 10) / 10;
+            });
+            
+            const newTotal = batches.reduce((sum, b) => sum + b.weight, 0);
+            if (Math.abs(newTotal - 100) > 0.01) {
+                const lastBatch = batches[batches.length - 1];
+                lastBatch.weight = Math.round((lastBatch.weight + (100 - newTotal)) * 10) / 10;
+            }
+            
+            renderBatches();
+        }
+
+        function normalizeTo100() {
+            if (batches.length === 0) return;
+            
+            const currentTotal = batches.reduce((sum, b) => sum + b.weight, 0);
+            if (currentTotal === 0) {
+                balanceEvenly();
+                return;
+            }
+            
+            batches.forEach(batch => {
+                let newWeight = (batch.weight / currentTotal) * 100;
+                batch.weight = parseFloat(newWeight.toFixed(2));
+            });
+            
+            renderBatches();
+        }
+
+        function autoBalanceIfNeeded(editedBatchIndex) {
+            if (!autoBalanceEnabled || batches.length === 0) return;
+            
+            const total = batches.reduce((sum, b) => sum + b.weight, 0);
+            
+            if (Math.abs(total - 100) > 0.1) {
+                const otherBatches = batches.filter((_, idx) => idx !== editedBatchIndex);
+                const otherTotal = otherBatches.reduce((sum, b) => sum + b.weight, 0);
+                const remainingWeight = 100 - batches[editedBatchIndex].weight;
+                
+                if (otherBatches.length > 0 && remainingWeight >= 0) {
+                    otherBatches.forEach(batch => {
+                        if (otherTotal > 0) {
+                            batch.weight = Math.round((batch.weight / otherTotal * remainingWeight) * 10) / 10;
+                        } else {
+                            batch.weight = Math.round((remainingWeight / otherBatches.length) * 10) / 10;
+                        }
+                    });
+                    
+                    const newTotal = batches.reduce((sum, b) => sum + b.weight, 0);
+                    if (Math.abs(newTotal - 100) > 0.01 && otherBatches.length > 0) {
+                        otherBatches[otherBatches.length - 1].weight = Math.round((otherBatches[otherBatches.length - 1].weight + (100 - newTotal)) * 10) / 10;
+                    }
+                    
+                    renderBatches();
+                }
+            }
+        }
+
+        function addBatch(batchData = null) {
+            const batch = batchData || {
+                id: Date.now(),
+                name: `Batch ${batches.length + 1}`,
+                weight: 0,
+                characterIds: []
+            };
+            batches.push(batch);
+            
+            if (autoBalanceEnabled) {
+                balanceEvenly();
+            } else {
+                renderBatches();
+            }
+        }
+
+        function removeBatch(id) {
+            batches = batches.filter(b => b.id !== id);
+            
+            if (autoBalanceEnabled && batches.length > 0) {
+                balanceEvenly();
+            } else {
+                renderBatches();
+            }
+        }
+
+        function updateBatchName(id, name) {
+            const batch = batches.find(b => b.id === id);
+            if (batch) batch.name = name;
+        }
+
+        function updateBatchWeight(id, weight, index) {
+            const batch = batches.find(b => b.id === id);
+            if (batch) {
+                const newWeight = parseFloat(weight) || 0;
+                batch.weight = newWeight;
+                
+                if (autoBalanceEnabled) {
+                    autoBalanceIfNeeded(index);
+                } else {
+                    renderBatches();
+                    validateWeights();
+                }
+            }
+        }
+
+        function addCharacterToBatch(batchId, characterId) {
+            const batch = batches.find(b => b.id === batchId);
+            if (batch && characterId) {
+                const idNum = parseInt(characterId);
+                if (!isNaN(idNum) && !batch.characterIds.includes(idNum)) {
+                    batch.characterIds.push(idNum);
+                    renderBatches();
+                }
+            }
+        }
+
+        function removeCharacterFromBatch(batchId, characterId) {
+            const batch = batches.find(b => b.id === batchId);
+            if (batch) {
+                batch.characterIds = batch.characterIds.filter(id => id !== characterId);
+                renderBatches();
+            }
+        }
+
+        function validateWeights() {
+            const totalWeight = batches.reduce((sum, batch) => sum + batch.weight, 0);
+            const totalRounded = Math.round(totalWeight * 10) / 10;
+            const warning = document.getElementById('weightWarning');
+            
+            if (Math.abs(totalRounded - 100) > 0.01) {
+                warning.style.display = 'block';
+                warning.innerHTML = `⚠️ Warning: Total weight is ${totalRounded}% - Must equal 100%!`;
+                warning.className = 'weight-warning';
+                return false;
+            } else {
+                warning.style.display = 'block';
+                warning.innerHTML = `✅ Valid: Total weight is ${totalRounded}%`;
+                warning.className = 'weight-warning weight-success';
+                return true;
+            }
+        }
+
+        function renderBatches() {
+            const container = document.getElementById('batchesContainer');
+            
+            if (batches.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 40px;">📭 No batches created. Click "Add Batch" to start.</div>';
+                return;
+            }
+
+            container.innerHTML = batches.map((batch, idx) => `
+                <div class="batch-item">
+                    <div class="batch-header">
+                        <div class="batch-title">📦 Batch ${idx + 1}: ${escapeHtml(batch.name)}</div>
+                        <button class="remove-batch" onclick="removeBatch(${batch.id})">🗑️ Remove</button>
+                    </div>
+                    <div class="form-group">
+                        <label>Batch Name</label>
+                        <input type="text" value="${escapeHtml(batch.name)}" onchange="updateBatchName(${batch.id}, this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label>⚖️ Batch Weight (%) (0-100) - Current: ${batch.weight}%</label>
+                        <input type="number" step="0.1" min="0" max="100" value="${batch.weight}" 
+                               onchange="updateBatchWeight(${batch.id}, this.value, ${idx})">
+                    </div>
+                    <div class="form-group">
+                        <label>🎴 Character IDs</label>
+                        <div class="note">📖 Follow Wiki Unit Data ID format (e.g., 10011)</div>
+                        <div class="character-ids" id="characterList-${batch.id}">
+                            ${batch.characterIds.map(id => `
+                                <div class="character-tag">
+                                    🆔 ${id}
+                                    <button onclick="removeCharacterFromBatch(${batch.id}, ${id})">✖️</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="add-character">
+                            <input type="number" id="newCharInput-${batch.id}" placeholder="Enter Character ID">
+                            <button onclick="addCharacterToBatch(${batch.id}, document.getElementById('newCharInput-${batch.id}').value)">➕ Add Character</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            validateWeights();
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function getCurrentBannerData() {
+            return {
+                BannerName: document.getElementById('bannerName').value,
+                BannerCost: parseInt(document.getElementById('bannerCost').value) || 0,
+                BannerUsesGem: !document.getElementById('bannerUsesZel').checked,
+                BannerUsesZel: document.getElementById('bannerUsesZel').checked,
+                BannerType: document.getElementById('bannerType').value,
+                BannerSplashArtImageName: document.getElementById('splashArtName').value,
+                BannerDescription: document.getElementById('bannerDescription').value,
+                BannerDescriptionExpanded: document.getElementById('bannerDescriptionExpanded').value,
+                BannerFeaturedCharacter: parseInt(document.getElementById('featuredCharacterId').value) || 0,
+                BannerFeaturedCharacterRateUp: parseFloat(document.getElementById('rateUpPercent').value) || 0,
+                BannerSummonPool: batches.map(batch => ({
+                    BatchName: batch.name,
+                    BatchWeight: batch.weight,
+                    CharacterIDs: batch.characterIds
+                }))
+            };
+        }
+
+        function setCurrentBannerData(data) {
+            document.getElementById('bannerName').value = data.BannerName || 'Banner 1';
+            document.getElementById('bannerCost').value = data.BannerCost || 0;
+            document.getElementById('bannerUsesZel').checked = data.BannerUsesZel || false;
+            document.getElementById('bannerType').value = data.BannerType || 'Standard';
+            document.getElementById('splashArtName').value = data.BannerSplashArtImageName || '';
+            document.getElementById('bannerDescription').value = data.BannerDescription || '';
+            document.getElementById('bannerDescriptionExpanded').value = data.BannerDescriptionExpanded || '';
+            document.getElementById('featuredCharacterId').value = data.BannerFeaturedCharacter || 0;
+            document.getElementById('rateUpPercent').value = data.BannerFeaturedCharacterRateUp || 0;
+            
+            batches = [];
+            if (data.BannerSummonPool && Array.isArray(data.BannerSummonPool)) {
+                data.BannerSummonPool.forEach(batch => {
+                    addBatch({
+                        id: Date.now() + Math.random(),
+                        name: batch.BatchName || 'Unnamed Batch',
+                        weight: batch.BatchWeight || 0,
+                        characterIds: batch.CharacterIDs || []
+                    });
+                });
+            }
+            renderBatches();
+        }
+
+        function previewJSON() {
+            if (batches.length === 0) {
+                alert('❌ Please add at least one batch to the summon pool!');
+                return;
+            }
+            
+            const totalWeight = batches.reduce((sum, b) => sum + b.weight, 0);
+            if (Math.abs(totalWeight - 100) > 0.01) {
+                alert(`❌ Total batch weight is ${totalWeight}%. It must equal exactly 100%!`);
+                return;
+            }
+            
+            const bannerData = getCurrentBannerData();
+            currentJsonData = bannerData;
+            const jsonString = JSON.stringify(bannerData, null, 2);
+            document.getElementById('jsonPreview').innerHTML = jsonString;
+        }
+
+        function downloadJSON() {
+            if (!currentJsonData) {
+                alert('❌ Please click "Preview JSON" first to generate the JSON data.');
+                return;
+            }
+            
+            const jsonString = JSON.stringify(currentJsonData, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const bannerName = currentJsonData.BannerName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            a.href = url;
+            a.download = `gacha_banner_${bannerName}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            alert('✅ JSON downloaded successfully!');
+        }
+
+        function importJSON() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    try {
+                        const data = JSON.parse(evt.target.result);
+                        setCurrentBannerData(data);
+                        previewJSON();
+                        alert('✅ JSON imported successfully!');
+                    } catch (error) {
+                        alert('❌ Error parsing JSON: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function resetForm() {
+            if (confirm('⚠️ Reset all banner data? This cannot be undone.')) {
+                document.getElementById('bannerName').value = 'Banner 1';
+                document.getElementById('bannerCost').value = '100';
+                document.getElementById('bannerUsesZel').checked = false;
+                document.getElementById('bannerType').value = 'Standard';
+                document.getElementById('splashArtName').value = '';
+                document.getElementById('bannerDescription').value = '';
+                document.getElementById('bannerDescriptionExpanded').value = '';
+                document.getElementById('featuredCharacterId').value = '0';
+                document.getElementById('rateUpPercent').value = '0';
+                batches = [];
+                renderBatches();
+                currentJsonData = null;
+                document.getElementById('jsonPreview').innerHTML = '👈 Click "Preview JSON" to see output';
+            }
+        }
+
+        function toggleBottomPanel() {
+            const content = document.getElementById('bottomContent');
+            const icon = document.getElementById('toggleIcon');
+            if (content.classList.contains('collapsed')) {
+                content.classList.remove('collapsed');
+                icon.textContent = '▼';
+            } else {
+                content.classList.add('collapsed');
+                icon.textContent = '▲';
+            }
+        }
+
+        addBatch();
+        setInterval(() => {
+            if (batches.length > 0) validateWeights();
+        }, 500);
+    </script>
+</body>
+</html>
